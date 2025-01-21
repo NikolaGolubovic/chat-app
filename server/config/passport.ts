@@ -14,8 +14,19 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await prisma.user.findUnique({ where: { googleId: profile.id } });
         const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+        console.log(profile.id);
+        let user = await prisma.user.findUnique({ where: { email } });
+        if (user && !user.googleId) {
+          await prisma.user.update({
+            where: {
+              email,
+            },
+            data: {
+              googleId: profile.id,
+            },
+          });
+        }
         if (!user) {
           user = await prisma.user.create({
             data: {
@@ -25,8 +36,7 @@ passport.use(
             },
           });
         }
-        const token = jwt.sign({ id: user.id, email: user.email }, process.env.SESSION_SECRET as string, { expiresIn: "1h" });
-        done(null, { user, token });
+        done(null, user);
       } catch (error) {
         done(error, false);
       }
