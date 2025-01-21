@@ -1,17 +1,33 @@
 import express from "express";
+import http from "http";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { PrismaClient } from "@prisma/client";
+import cors from "cors";
 import homeRoutes from "./routes/index";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
-import { errorHandler } from "./middleware/ErrorHandler";
-import "./config/passport";
+import { initializeSocket } from "./sockets";
 
-const app = express();
+import "./config/passport";
+import { errorHandler } from "./middleware/ErrorHandler";
+
+// const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
+
+const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
+
+const server = http.createServer(app);
+
+initializeSocket(server);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -37,7 +53,7 @@ app.use("/user", userRoutes);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 

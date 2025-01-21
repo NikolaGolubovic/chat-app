@@ -1,7 +1,6 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Router } from "express";
 import { changePassword, resetPassword, resetPasswordPage, setPasswordController } from "../controllers/userController";
 import { setPasswordValidation } from "../validators/authValidators";
-import { validationResult } from "express-validator";
 import { handleValidationErrors } from "../utils/helpers";
 
 const router = Router();

@@ -1,6 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
 import passport from "passport";
-import jwt from "jsonwebtoken";
 import { ensureAuthenticated } from "../middleware/authmiddleware";
 import { register, login } from "../controllers/authController";
 import { registerValidation, loginValidation } from "../validators/authValidators";
@@ -27,7 +26,9 @@ router.post("/login", loginValidation, (req: Request, res: Response, next: NextF
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email", "openid"] }));
 
 router.get("/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req: Request, res: Response) => {
-  res.redirect("/");
+  const user = req.user as any;
+  res.cookie("jwt", user.token, { httpOnly: false, secure: process.env.NODE_ENV === "production" });
+  res.status(200).json({ msg: "success", token: user.token });
 });
 
 router.get("/logout", (req: Request, res: Response, next: NextFunction) => {
