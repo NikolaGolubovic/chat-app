@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
 
 export const home = (req: Request, res: Response) => {
-  res.send("Hello, Worlds!");
+  res.send("Hello, World!");
 };
