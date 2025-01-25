@@ -1,5 +1,6 @@
 import { createLazyFileRoute, createRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 
 export const Route = createLazyFileRoute("/login")({
@@ -9,16 +10,16 @@ export const Route = createLazyFileRoute("/login")({
 function Login() {
   const navigate = useNavigate();
   const handleLogin = async () => {
-    const response = await fetch("/api/auth/google/callback", {
-      method: "GET",
-      credentials: "include",
-    });
-    if (response.ok) {
+    try {
+      window.location.href = "http://localhost:3000/auth/google";
+      const notify = () => toast.info("This is a toast notification !");
+      notify();
       navigate({
         to: "/",
       });
-    } else {
-      console.error("Login failed");
+    } catch (error) {
+      const notify = () => toast.error("This is a toast notification !");
+      notify();
     }
   };
 
@@ -26,11 +27,9 @@ function Login() {
     try {
       const response = await fetch("/api/auth/logout", {
         method: "GET",
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
       });
       if (response.ok) {
-        // Redirect to the login page or home page after successful logout
-        console.log(".......");
         Cookies.remove("jwt");
         Cookies.remove("connect.sid");
         navigate({
